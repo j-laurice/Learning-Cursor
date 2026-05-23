@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Meme Lab</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <nav class="topbar">
+    <div class="topbar-brand">
+      <span class="brand-mark" aria-hidden="true">M</span>
+      <div>
+        <strong class="brand-name">Meme Lab</strong>
+        <span class="brand-tag">Create. Drag. Download.</span>
+      </div>
+    </div>
+    <button type="button" class="btn btn-download" id="download-btn" disabled>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      <span class="btn-label">Download PNG</span>
+    </button>
+  </nav>
+
+  <main class="workspace">
+    <section class="stage" aria-label="Meme preview">
+      <div class="stage-inner">
+        <div class="canvas-frame" id="canvas-wrapper">
+          <canvas id="meme-canvas"></canvas>
+          <div class="canvas-placeholder" id="canvas-placeholder">
+            <div class="placeholder-icon" aria-hidden="true">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+            </div>
+            <p class="placeholder-title">Your meme goes here</p>
+            <p class="placeholder-hint">Pick a template or upload an image to start</p>
+          </div>
+        </div>
+        <p class="stage-hint" id="stage-hint">Click text to select · drag to reposition</p>
+      </div>
+    </section>
+
+    <aside class="panel" aria-label="Editor controls">
+      <section class="panel-block">
+        <h2 class="panel-heading">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+          Image
+        </h2>
+        <label class="upload-zone">
+          <input type="file" id="file-upload" accept="image/*" hidden />
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          <span>Upload your own image</span>
+        </label>
+      </section>
+
+      <section class="panel-block">
+        <h2 class="panel-heading">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          Templates
+        </h2>
+        <div class="template-scroll" id="template-grid">
+          <button type="button" class="template-btn" data-src="templates/drake.jpg" data-name="Drake">
+            <img src="templates/drake.jpg" alt="" />
+            <span>Drake</span>
+          </button>
+          <button type="button" class="template-btn" data-src="templates/distracted-boyfriend.jpg" data-name="Distracted Boyfriend">
+            <img src="templates/distracted-boyfriend.jpg" alt="" />
+            <span>Distracted</span>
+          </button>
+          <button type="button" class="template-btn" data-src="templates/two-buttons.jpg" data-name="Two Buttons">
+            <img src="templates/two-buttons.jpg" alt="" />
+            <span>Two Buttons</span>
+          </button>
+          <button type="button" class="template-btn" data-src="templates/expanding-brain.jpg" data-name="Expanding Brain">
+            <img src="templates/expanding-brain.jpg" alt="" />
+            <span>Brain</span>
+          </button>
+        </div>
+      </section>
+
+      <section class="panel-block">
+        <div class="panel-heading-row">
+          <h2 class="panel-heading">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg>
+            Text
+          </h2>
+          <button type="button" class="btn btn-add" id="add-text-btn" disabled>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Add
+          </button>
+        </div>
+
+        <ul class="layer-list" id="layer-list" hidden></ul>
+
+        <div class="text-controls" id="text-controls" hidden>
+          <label class="field">
+            <span class="field-label">Caption</span>
+            <input type="text" id="text-input" placeholder="Your text here" />
+          </label>
+
+          <label class="field">
+            <span class="field-label">Size <output id="font-size-value" for="font-size-slider">48</output>px</span>
+            <input type="range" id="font-size-slider" min="16" max="120" value="48" />
+          </label>
+
+          <label class="field color-field">
+            <span class="field-label">Color</span>
+            <div class="color-row">
+              <input type="color" id="text-color-input" value="#ffffff" />
+              <span class="color-hex" id="color-hex">#FFFFFF</span>
+            </div>
+          </label>
+
+          <button type="button" class="btn btn-danger" id="delete-text-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+            Remove layer
+          </button>
+        </div>
+
+        <p class="panel-empty" id="text-empty">Add text after loading an image</p>
+      </section>
+    </aside>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
