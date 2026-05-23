@@ -1,4 +1,8 @@
 import json
+import os
+import ssl
+import sys
+import urllib.error
 import urllib.parse
 import urllib.request
 
@@ -6,9 +10,50 @@ GEOCODING_URL = "https://geocoding-api.open-meteo.com/v1/search"
 FORECAST_URL = "https://api.open-meteo.com/v1/forecast"
 
 
+def ssl_context() -> ssl.SSLContext:
+    """Build a context that can verify HTTPS on macOS python.org installs."""
+    ca_sources: list[str] = []
+
+    try:
+        import certifi
+
+        ca_sources.append(certifi.where())
+    except ImportError:
+        pass
+
+    defaults = ssl.get_default_verify_paths()
+    if defaults.openssl_cafile:
+        ca_sources.append(defaults.openssl_cafile)
+    ca_sources.extend(["/etc/ssl/cert.pem", "/private/etc/ssl/cert.pem"])
+
+    for ca_file in ca_sources:
+        if ca_file and os.path.isfile(ca_file):
+            return ssl.create_default_context(cafile=ca_file)
+
+    return ssl.create_default_context()
+
+
 def fetch_json(url: str) -> dict:
-    with urllib.request.urlopen(url, timeout=15) as response:
+    request = urllib.request.Request(url)
+    with urllib.request.urlopen(request, timeout=15, context=ssl_context()) as response:
         return json.load(response)
+
+
+def ssl_help_message() -> str:
+    python_root = os.path.dirname(os.path.dirname(sys.executable))
+    cert_installer = os.path.join(python_root, "Install Certificates.command")
+    lines = [
+        "SSL certificate verification failed. This is common with Python from python.org on Mac.",
+        "",
+        "Fix (pick one):",
+        f"  1. Double-click: {cert_installer}",
+        "     (then run this script again)",
+        "  2. Or run: pip3 install certifi",
+        "  3. Or use Homebrew Python: brew install python",
+    ]
+    if not os.path.isfile(cert_installer):
+        lines[3] = "  1. Re-run the Python installer, or run: pip3 install certifi"
+    return "\n".join(lines)
 
 
 def lookup_city(name: str) -> dict:
@@ -82,7 +127,11 @@ def main() -> None:
         print(err)
         return
     except urllib.error.URLError as err:
-        print(f"Could not reach the weather service: {err}")
+        reason = getattr(err, "reason", None)
+        if isinstance(reason, ssl.SSLCertVerificationError) or "CERTIFICATE_VERIFY_FAILED" in str(err):
+            print(ssl_help_message())
+        else:
+            print(f"Could not reach the weather service: {err}")
         return
 
     current = weather["current"]
